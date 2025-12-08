@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog Yazısı</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/NatCatPic-removebg-preview.png" type="image/png">
+
+  <style>
+    /* Copy butonu ve code-wrapper stili */
+    .code-wrapper {
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    pre {
+      background: #1e1e1e;
+      color: #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0;
+    }
+  </style>
+
+</head>
+<body>
+
+
+
+<div class="post-container">
+  <h1 id="post-title"></h1>
+  <p id="post-date"></p>
+  <div id="post-content"></div>
+</div>
+
+<!-- LIGHTBOX HTML -->
+<div id="lightbox" class="lightbox">
+  <span class="close-btn">&times;</span>
+  <img id="lightbox-img">
+  <button class="nav-btn left">&#10094;</button>
+  <button class="nav-btn right">&#10095;</button>
+</div>
+
+<!-- YORUM SİSTEMİ VS BURADA -->
+<!-- ------------------ YORUM SİSTEMİ (SABİT MAIL) ------------------ -->
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // URL’den post id’yi al
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get("id");
+
+    // Formspree'ye gönderilecek gizli input
+    document.getElementById("post_id").value = "Post ID: " + postId;
+
+    const form = document.getElementById("commentForm");
+    const status = document.getElementById("formStatus");
+
+    // AJAX ile gönderim
+    form.addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        status.textContent = "Gönderiliyor...";
+
+        const data = new FormData(form);
+
+        const res = await fetch(form.action, {
+            method: form.method,
+            body: data,
+            headers: { "Accept": "application/json" }
+        });
+
+        if (res.ok) {
+            status.textContent = "Yorum başarıyla gönderildi! 🎉";
+            form.reset();
+        } else {
+            status.textContent = "Gönderilirken hata oluştu. Tekrar deneyin!";
+        }
+    });
+
+});
+</script>
+
+<script>
+  
+// -----------------------------------------------------
+//  JSON'dan gelen "content" içine otomatik COPY EKLEYEN KOD
+// -----------------------------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const container = document.getElementById("post-content");
+
+  // post-content içine JSON’dan gelen HTML zaten eklenecek
+  // Şimdi o içerideki pre > code bloklarını bulalım
+  const codeBlocks = container.querySelectorAll("pre");
+
+  codeBlocks.forEach(pre => {
+    // wrapper oluştur
+    const wrap = document.createElement("div");
+    wrap.className = "code-wrapper";
+
+    // copy butonu
+    const btn = document.createElement("button");
+    btn.className = "copy-btn";
+    btn.textContent = "Copy";
+
+    // tıklayınca kopyala
+    btn.addEventListener("click", () => {
+      const code = pre.innerText;
+      navigator.clipboard.writeText(code);
+      alert("Kod kopyalandı!");
+    });
+
+    // pre'yi wrapper içine yerleştir
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+    wrap.appendChild(btn);
+  });
+
+});
+</script>
+
+
+<!-- SİTE KODLARIN DEVAMI -->
+<script src="script.js"></script>
+</body>
+</html>
